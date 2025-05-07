@@ -38,3 +38,40 @@ Repeat for confirmation:
 Recognized Database Authentications.
 Admin User admin created.
 ```
+
+# UI側からDBの接続確認
+
+```
+bash -c "exec 3<>/dev/tcp/superset_db/5432; echo OK"
+OK
+```
+
+試しにポートを変えた
+
+```
+bash -c "exec 3<>/dev/tcp/superset_db/5431; echo OK"
+bash: connect: Connection refused
+bash: line 1: /dev/tcp/superset_db/5431: Connection refused
+OK
+```
+
+# PostgereSQLへデータ追加
+
+PostgreSQLにログイン
+```
+psql -U username -d dbname
+```
+ DB一覧表示
+```
+\l
+```
+ テーブル一覧表示
+```
+\dt
+```
+SELECT文実行
+```
+SELECT * FROM table_name;
+```
+# ダッシュボードの作成
+
