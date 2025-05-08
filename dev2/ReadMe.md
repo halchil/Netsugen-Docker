@@ -26,11 +26,16 @@ pgAdminにログイン
 以下の情報を入力
 General タブ:
 Name: 任意の名前（例: Superset Database など）
+
 Connection タブ:
 Host name/address: PostgreSQLのコンテナ名（この例では superset_db）
+
 Port: 5432（デフォルト）
+
 Maintenance database: superset
+
 Username: superset（PostgreSQLのユーザー名）
+
 Password: superset（PostgreSQLのパスワード）入力後、接続を保存して完了。
 
 # トラブルシュート
