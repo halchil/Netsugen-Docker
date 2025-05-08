@@ -1,50 +1,47 @@
-# キレイにする
+# 起動済コンテナをクリーンにする
 
+DB情報などが引き継がれないように、コンテナ周りをきれいにする。
+```
 docker compose -f superset-dev.yaml down --volumes --rmi all
+```
 
+起動時も同様に、イメージビルドから行う。
 
-起動も同様
-
+```
 docker compose -f superset-dev.yaml up --build
+```
 
+# Docker Network作成
 
-# network作成
-
+以下のコマンドより、`superset-net`ネットワークを作成する。
+```
 docker network create superset-net
+```
 
+# PostgreSQLの接続設定
 
-#
+pgAdminにログイン
+左側の「Servers」を右クリックして、「Create」→「Server」を選択する。
 
-PostgreSQLの接続設定:
+以下の情報を入力
+General タブ:
+Name: 任意の名前（例: Superset Database など）
+Connection タブ:
+Host name/address: PostgreSQLのコンテナ名（この例では superset_db）
+Port: 5432（デフォルト）
+Maintenance database: superset
+Username: superset（PostgreSQLのユーザー名）
+Password: superset（PostgreSQLのパスワード）入力後、接続を保存して完了。
 
-    pgAdminにログインした後、左側の「Servers」を右クリックして、「Create」→「Server」を選択します。
+# トラブルシュート
 
-    以下の情報を入力します:
+ユーザを作成し、pgadmin起動
 
-        General タブ:
+```
+[実行コマンド]
+docker compose  -f pgadmin-dev.yaml up -d
 
-            Name: 任意の名前（例: Superset Database など）
-
-        Connection タブ:
-
-            Host name/address: PostgreSQLのコンテナ名（この例では superset_db）
-
-            Port: 5432（デフォルト）
-
-            Maintenance database: superset
-
-            Username: superset（PostgreSQLのユーザー名）
-
-            Password: superset（PostgreSQLのパスワード）
-
-    入力後、接続を保存して完了です。
-
-    # トラブルシュート
-    ユーザを作成した
-
-    # pgadmin起動
-
-    docker compose  -f pgadmin-dev.yaml up -d
+[結果]
 WARN[0000] /home/mainte/Netsugen-Docker/dev2/pgadmin-dev.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
 WARN[0000] networks.default: external.name is deprecated. Please set name and external: true 
 [+] Running 6/17
@@ -57,18 +54,21 @@ WARN[0000] networks.default: external.name is deprecated. Please set name and ex
    ✔ e35a1a6248a3 Download complete                                        3.4s 
    ✔ 10cbb4977e53 Download complete                                        3.7s 
    ⠋ 6a32f2ccafba Waiting                                                  4.0s 
-
-
+...
+```
 # UI接続確認
 コンテナが立ち上がり、接続できた
 
-http://192.168.56.129:5050
+自分のローカルサーバのIPを使って、
+`http://192.168.56.129:5050`でアクセス。
+UTを表示できた。
 
 # DB登録
-完了した。アイコンから比較的簡単に設定可能。
+完了
+アイコンから比較的簡単に設定可能。
 
 # ファイルアップロードしてテーブル作成したい
 
 気象データセット
-[Kaggel Dataset](https://www.kaggle.com/datasets/muthuj7/weather-dataset)
+[Kaggle Dataset](https://www.kaggle.com/datasets/muthuj7/weather-dataset)
 
