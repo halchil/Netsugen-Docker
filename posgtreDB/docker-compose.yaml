@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  # PostgreSQL データベースサービス
+  db:
+    image: postgres:13 # PostgreSQLのバージョン
+    container_name: postgres_db # コンテナ名
+    environment:
+      # データベースの環境変数
+      - POSTGRES_DB=mydatabase # データベース名
+      - POSTGRES_USER=myuser # データベースユーザー名
+      - POSTGRES_PASSWORD=mypassword # データベースパスワード
+    volumes:
+      - pgdata:/var/lib/postgresql/data # データを永続化するためのボリューム
+    networks:
+      - app-net # サービスを接続するネットワーク
+
+  # pgAdmin管理ツールサービス
+  pgadmin:
+    image: dpage/pgadmin4:latest # pgAdminのイメージ
+    container_name: pgadmin # コンテナ名
+    environment:
+      # pgAdminのログイン情報
+      - PGADMIN_DEFAULT_EMAIL=admin@example.com # pgAdminのデフォルトログインメールアドレス
+      - PGADMIN_DEFAULT_PASSWORD=admin # pgAdminのデフォルトログインパスワード
+    ports:
+      - "5050:80" # ホストの5050ポートをコンテナの80ポートにマッピング
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin # pgAdminのデータを永続化するためのボリューム
+      - ./csv:/var/lib/pgadmin/csv # CSVファイルをインポート/エクスポートするためのマウントポイント
+    depends_on:
+      - db # dbサービスが起動した後にpgadminを起動する
+    networks:
+      - app-net # サービスを接続するネットワーク
+
+# 永続化のためのボリューム定義
+volumes:
+  pgdata: # PostgreSQLのデータ用ボリューム
+  pgadmin_data: # pgAdminのデータ用ボリューム
+
+# サービス間通信のためのネットワーク定義
+networks:
+  app-net: # このdocker-composeファイルで作成されるネットワーク
