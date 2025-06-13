@@ -1,0 +1,50 @@
+version: '3.8'
+
+services:
+  superset:
+    # image: apache/superset:latest
+    build:
+      context: .
+      dockerfile: Dockerfile  # 追加
+    container_name: superset
+    ports:
+      - "8088:8088"
+    environment:
+      - SUPERSET_ENV=production
+      - SUPERSET_LOAD_EXAMPLES=no
+      - SUPERSET_SECRET_KEY=your_very_secret_key
+      - SQLALCHEMY_DATABASE_URI=postgresql+psycopg2://superset:superset@db:5432/superset
+    depends_on:
+      - db
+    volumes:
+      - superset_home:/app/superset_home
+    
+    networks:
+      - superset-net
+    
+    command: >
+      /bin/bash -c "
+      superset db upgrade &&
+      superset init &&
+      superset run -h 0.0.0.0 -p 8088
+      "
+
+  db:
+    image: postgres:13
+    container_name: superset_db
+    environment:
+      - POSTGRES_DB=superset
+      - POSTGRES_USER=superset
+      - POSTGRES_PASSWORD=superset
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - superset-net
+
+volumes:
+  pgdata:
+  superset_home:
+
+networks:
+  superset-net:
+    external: true
