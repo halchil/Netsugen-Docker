@@ -203,7 +203,18 @@ http://ec2-xxx-xxx-xxx-xxx.ap-northeast-1.compute.amazonaws.com/
 ```
 (httpは80番ポートでのバインドのため)接続できた。
 
+コンテナを停止する。
+
+```
+[実行コマンド]
+docker stop [コンテナ名]
+docker rm [コンテナ名]
+```
+
+# Next
+
 今回は`docker run`コマンドを使って、とりあえずコンテナを立ち上げた。
+
 
 しかし、コンテナは環境に応じてより柔軟にカスタマイズ可能である。
 
