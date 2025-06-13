@@ -1,25 +1,18 @@
 # はじめに
-Netsugenセミナー
+6/21 Netsugen Dockerセミナーにご参加いただきありがとうございます。
 
-[システム構成図]
-ココにシステム構成図を記載
+# ローカルにコードをクローンする。
 
-# 目的
-docekrの理解
-ネットワーク
-ボリュームなど
+```
+git clone https://github.com/halchil/Netsugen-Docker.git
+```
 
-# バージョンの管理
+# OSSバージョンの管理
 OSSを使う際は、常にリリースノートや最新情報をキャッチしておくことが重要となる。
-
 今回はApache SupersetとPostgreSQLの活用に伴い、関連ドキュメントを貼る。
 
-## Officialサイト
-
-## GitHubリポジトリ
 
 [Apache Superset GitHub](https://github.com/apache/superset)
-
 [PostgreSQL Github](https://github.com/postgres/postgres)
 
 
@@ -88,86 +81,4 @@ OK
 ```
 ポートをわざと異なるものに設定した場合、接続が通らなくなった。ここからも、ポート指定が正しく行われていたことが分かった。
 
-# PostgereSQLへデータ追加
 
-PostgreSQLにログイン
-```
-$ psql -U username -d dbname
-```
- DB一覧表示
-```
-$ \l
-```
-データベースに接続
-```
-$ \c データベース名
-```
-$ テーブル一覧表示
-```
-$ \dt
-```
-SELECT文実行
-```
-$ SELECT * FROM table_name;
-```
-
-テーブル作成(そのままコピーして流してOK)
-```
-CREATE TABLE sales (
-    id SERIAL PRIMARY KEY,
-    product_name VARCHAR(100),
-    quantity INT,
-    price DECIMAL
-);
-```
-
-確認
-```
-[実行コマンド]
-superset=# SELECT * FROM sales;
-
-[結果]
-id | product_name | quantity | price 
-----+--------------+----------+-------
-(0 rows)
-```
-現在、該当のテーブルは空なので、データを挿入する。
-
-```
-[実行コマンド]
-INSERT INTO sales (product_name, quantity, price) 
-VALUES ('Product A', 100, 19.99),
-       ('Product B', 50, 29.99);
-
-```
-
-先ほどと同様のselect文にて以下のように結果を確認する。
-
-
-```
-[実行コマンド]
-SELECT * FROM sales;
-
-[結果]
- id | product_name | quantity | price 
-----+--------------+----------+-------
-  1 | Product A    |      100 | 19.99
-  2 | Product B    |       50 | 29.99
-(2 rows)
-
-```
-
-# UI側で確認
-
-![UI](./img/img1.png)
-
-チャートを作成する。
-
-![chart](./img/chart1.png)
-
-SQL Labからクエリを投げてみる。
-
-![SQL Lab](./img/sql-lab1.png)
-
-ダッシュボードの作成
-検証中
