@@ -1,74 +1,152 @@
-# 事前準備
+# DB解析用のBIツールコンテナを起動する
 
-# 起動済コンテナをクリーンにする
+work3までで、webサーバ、DB用のコンテナを立ち上げることができた。
+ここでは、新たにBIツール用のコンテナを立ち上げ、データ解析を行う。
 
-DB情報などが引き継がれないように、コンテナ周りをきれいにする。
+# 起動済コンテナ周りををクリーンにする
+
+DB情報などが引き継がれないように、コンテナ周りを確認しておく。
+
+Docker Volume(ホストとコンテナでデータ連携するためのもの)確認
 ```
-docker compose -f superset-dev.yaml down --volumes --rmi all
+[確認コマンド]
+docker volume list
+
+[結果]
+DRIVER    VOLUME NAME
+local     posgtredb_pgadmin_data
+local     posgtredb_pgdata
+local     work3_postgresql_pgadmin_data
+local     work3_postgresql_pgdata
 ```
 
-起動時も同様に、イメージビルドから行う。
+Docker Network確認
+```
+[確認コマンド]
+docker network list
+
+[結果]
+NETWORK ID     NAME                DRIVER    SCOPE
+d2de2cc65433   bridge              bridge    local
+c8df5d5985f0   host                host      local
+144630201e2d   none                null      local
+d966ab2a6077   posgtredb_app-net   bridge    local
 
 ```
-docker compose -f superset-dev.yaml up --build
+
+ワークショップの過程でたくさん作成されているが、いったんこのままにする。
+
+削除したい場合は、`docker volume rm [volume名]`と入力する。
+
+
+# コンテナの起動
+
+イメージビルドから行う。
+
+```
+[実行コマンド]
+docker compose -f docker-compose.yaml up --build -d
+
+[結果]
+[+] Building 15.4s (3/5)                                                                                                                                                                        docker:default
+ => [superset internal] load build definition from Dockerfile                                                                                                                                             0.1s
+ => => transferring dockerfile: 107B                                                                                                                                                                      0.0s
+ => [superset internal] load metadata for docker.io/apache/superset:latest                                                                                                                                1.9s
+ => [superset internal] load .dockerignore                                                                                                                                                                0.0s
+ => => transferring context: 2B                                                                                                                                                                           0.0s
+ => [superset 1/2] FROM docker.io/apache/superset:latest@sha256:2fcf0baa9db5ad5a6b345afa46604b25740d4014430d7d09eaf8d5ae76aa451c                                                                         13.4s
+ => => resolve docker.io/apache/superset:latest@sha256:2fcf0baa9db5ad5a6b345afa46604b25740d4014430d7d09eaf8d5ae76aa451c                                                                                   0.0s
+ => => sha256:aa4c50520a70b21f24a2a395328e3918494d36680515b554a3c2a05ea55ba67e 3.53kB / 3.53kB                                                                                                            0.0s
+ => => sha256:dad67da3f26bce15939543965e09c4059533b025f707aad72ed3d3f3a09c66f8 28.23MB / 28.23MB                                                                                                          1.0s
+ => => sha256:4b03b4f4fa5c508f2b215b45a26f6dd30b310aaa2a4a24b593f630bdf07da1a8 3.51MB / 3.51MB                                                                                                            0.5s
+ => => sha256:50a956a18493962b03f716b86299535ce63a1d6a1a1770be582b59f8fedb46b7 15.65MB / 15.65MB      
 ```
 
-# Docker Network作成
+コンテナが立ち上がったらWebUIからアクセスする。
 
-以下のコマンドより、`superset-net`ネットワークを作成する。
+
 ```
-docker network create superset-net
+[アクセス用URL]
+http://ec2-xxx-xxx-xxx-xxx.ap-northeast-1.compute.amazonaws.com:8088
 ```
+
+サインイン画面が表示される。
+![img](./img/w4img-01.png)
+
+Apache Supsersetの場合、手動で初期ユーザを作成する必要がある。
+
+
+# 初期ユーザ・初期パスワードの作成
+
+Apache SupsersetコンテナはUIでの接続確認ができても、ユーザが登録されていない。
+
+そのため、コンテナ側からユーザを作成する。(今回はデフォルトでOK パスワードもadmin)
+```
+[実行コマンド]
+docker exec -it superset superset fab create-admin
+
+[結果]
+/usr/local/lib/python3.10/site-packages/flask_limiter/extension.py:
+...
+
+[以下、入力画面(ブランク入力でデフォルト値が入る)]
+Username [admin]: 
+User first name [admin]: 
+User last name [user]: 
+Email [admin@fab.org]: 
+Password: 
+Repeat for confirmation: 
+Recognized Database Authentications.
+Admin User admin created.
+
+```
+
+ログインできた
+
+![img](./img/w4img-02.png)
+
+
 
 # PostgreSQLの接続設定
 
 pgAdminにログイン
-左側の「Servers」を右クリックして、「Create」→「Server」を選択する。
+
+```
+[URL]
+http://ec2-xxx-xxx-xxx-xxx.ap-northeast-1.compute.amazonaws.com:5050
+
+ユーザ情報の入力(docker-compose.yamlのpgadmin部分参照)
+ユーザ：admin@admin.com
+パスワード：admin
+```
+
+左側の「Servers」を右クリックして、「Register」→「Server」を選択する。
 
 以下の情報を入力
-General タブ:
+
+```
+◆General タブ
 Name: 任意の名前（例: Superset Database など）
 
-Connection タブ:
-Host name/address: PostgreSQLのコンテナ名（この例では superset_db）
-
+◆Connection タブ
+Host name/address: PostgreSQLのコンテナ名(superset_db)
 Port: 5432（デフォルト）
-
 Maintenance database: superset
-
 Username: superset（PostgreSQLのユーザー名）
-
 Password: superset（PostgreSQLのパスワード）入力後、接続を保存して完了。
-
-# トラブルシュート
-
-ユーザを作成し、pgadmin起動
-
 ```
-[実行コマンド]
-docker compose  -f pgadmin-dev.yaml up -d
 
-[結果]
-WARN[0000] /home/mainte/Netsugen-Docker/dev2/pgadmin-dev.yaml: the attribute `version` is obsolete, it will be ignored, please remove it to avoid potential confusion 
-WARN[0000] networks.default: external.name is deprecated. Please set name and external: true 
-[+] Running 6/17
- ⠧ pgadmin [⣿⡀⣿⣿⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀] Pulling                                      7.7s 
-   ✔ f18232174bc9 Already exists                                           0.0s 
-   ⠋ 1df1dde7c499 Downloading  24.13MB/102.9MB                             4.0s 
-   ✔ a382f7466647 Download complete                                        2.1s 
-   ✔ 51289cd114c2 Download complete                                        1.0s 
-   ✔ 6f5081be338a Download complete                                        2.6s 
-   ✔ e35a1a6248a3 Download complete                                        3.4s 
-   ✔ 10cbb4977e53 Download complete                                        3.7s 
-   ⠋ 6a32f2ccafba Waiting                                                  4.0s 
-...
-```
-# UI接続確認
-コンテナが立ち上がり、接続できた
+# ファイルアップロードしてテーブルを作成する
 
-自分のローカルサーバのIPを使って、
-`http://192.168.56.129:5050`でアクセス。
-UTを表示できた。
+# データ可視化
+
+Kaggleから気象データを取得・アップロード
+
+# 応用問題
+
+## 自動化
+Airflow
+
 
 # DB登録
 完了

@@ -37,25 +37,7 @@ docker-compose -f superset-dev.yaml up -d
 Apache Supersetは、Pythonベースで記載されている。
 レベルアップに伴い、OSSのコード読解・コントリビュートも視野に入れていきたいので、軽くソースを読んでみる。
 
-# 初期パスワード作成
 
-Apache SupsersetコンテナはUIでの接続確認ができても、ユーザが登録されていない。そのため、コンテナ側からユーザを作成する。
-```
-[実行コマンド]
-docker exec -it superset superset fab create-admin
-
-[結果]
-/usr/local/lib/python3.10/site-packages/flask_limiter/extension.py:
-...
-Username [admin]: 
-User first name [admin]: 
-User last name [user]: 
-Email [admin@fab.org]: 
-Password: 
-Repeat for confirmation: 
-Recognized Database Authentications.
-Admin User admin created.
-```
 
 # CLIでDBの接続確認
 Apache Supersetコンテナにて、きちんとPostgreSQLコンテナにへ接続が通るか簡単にテストする。

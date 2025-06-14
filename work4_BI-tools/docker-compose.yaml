@@ -60,4 +60,3 @@ volumes:
 
 networks:
   superset-net:
-    external: true
