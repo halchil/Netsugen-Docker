@@ -5,7 +5,7 @@ services:
     # image: apache/superset:latest
     build:
       context: .
-      dockerfile: Dockerfile  # 追加
+      dockerfile: Dockerfile
     container_name: superset
     ports:
       - "8088:8088"
@@ -18,10 +18,8 @@ services:
       - db
     volumes:
       - superset_home:/app/superset_home
-    
     networks:
       - superset-net
-    
     command: >
       /bin/bash -c "
       superset db upgrade &&
@@ -41,9 +39,24 @@ services:
     networks:
       - superset-net
 
+  pgadmin:
+    image: dpage/pgadmin4:latest
+    container_name: pgadmin
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=admin@admin.com
+      - PGADMIN_DEFAULT_PASSWORD=admin
+    ports:
+      - "5050:80"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./csv:/var/lib/pgadmin/csv
+    networks:
+      - superset-net
+
 volumes:
   pgdata:
   superset_home:
+  pgadmin_data:
 
 networks:
   superset-net:

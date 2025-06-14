@@ -1,10 +1,13 @@
 # コンテナを立ち上げても500エラー
 
+```
+[実行コマンド]
 docker logs
 
+[結果]
 AttributeError: 'NoneType' object has no attribute 'is_active'
 2025-05-07 05:38:36,851:INFO:werkzeug:192.168.56.1 - - [07/May/2025 05:38:36] "GET /superset/welcome/ HTTP/1.1" 500 -
-
+```
 
 このエラーは、user が None になっている（つまり、認証されたユーザーが存在しない）ときに発生
 
